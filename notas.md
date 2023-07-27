@@ -197,7 +197,7 @@ Pagina donde están guardadas todas las imágenes que se pueden descargar en el 
 
 ### Manejo de procesos
 
-Al correr un contenedor con el comando docker run, se crea un contenedor basado en la imagen, sin embargo, si se quiere usar la terminal no se va a poder por que se esta ejecutando el proceso del contenedor, si se desea ejecutar otro comando se tendría que detener el proceso. La manera de correr un contenedor en segundo plano es agregando la bandera -d
+Al correr un contenedor con el comando docker run, se crea un contenedor basado en la imagen, sin embargo, si se quiere usar la terminal no se va a poder por que se esta ejecutando el proceso del contenedor, si se desea ejecutar otro comando se tendría que detener el proceso. La manera de correr un contenedor en segundo plano es agregando la bandera `-d`
 
 ```
 docker run -d nginx
@@ -252,9 +252,9 @@ docker exec mi-nginx ls
 docker exec mi-nginx mkdir hola-mundo
 ```
 
-Este comando ejecutará el comando _ls_ dentro del container que contiene nginx, pudiendo acceder a nuestro sistema de archivos
+Este comando ejecutará el comando `ls` dentro del container que contiene nginx, pudiendo acceder a nuestro sistema de archivos
 
-La bandera -it (interactive) nos permite ejecutar los comandos como si estuvieramos dentro del container, acccediendo a mas funciones
+La bandera `-it`(interactive) nos permite ejecutar los comandos como si estuvieramos dentro del container, acccediendo a mas funciones
 
 ```
 docker exec -it mi-nginx ls
@@ -268,26 +268,26 @@ docker exec -it mi-nginx bash
 
 ### Detener y Eliminar Contenedores
 
-Entonces, si se quiere detener alguno de los contenedores que se están ejecutando, se utiliza el siguiente docker stop, se escribe el comando y el nombre o identificador del contenedor.
+Entonces, si se quiere detener alguno de los contenedores que se están ejecutando, se utiliza el siguiente `docker stop`, se escribe el comando y el nombre o identificador del contenedor.
 
 ```
 docker stop mi-nginx
 docker stop 414dcdc8b031
 ```
 
-Importante saber que docker stop solo detiene el funcionamiento de los contenedores, no los elimina, entonces, el contenedor sigue en la computadora local, para saber cuales contenedores son todos los contenedores, sin importar que estén en funcionamiento o detenidos, se agrega la bandera -a
+Importante saber que `docker stop` solo detiene el funcionamiento de los contenedores, no los elimina, entonces, el contenedor sigue en la computadora local, para saber cuales contenedores son todos los contenedores, sin importar que estén en funcionamiento o detenidos, se agrega la bandera `-a`
 
 ```
 docker ps -a
 ```
 
-Para eliminar contenedores, se usa el comando rm, que significa remove, permite eliminar contenedores que no se estén utilizando
+Para eliminar contenedores, se usa el comando `rm`, que significa remove, permite eliminar contenedores que no se estén utilizando
 
 ```
 docker rm mi-nginx
 ```
 
-Existe una manera de saltarse el proceso de detener el contenedor y después eliminarlo, la bandera - - rm, esto para eliminar el contenedor cuando este falle o se detenga
+Existe una manera de saltarse el proceso de detener el contenedor y después eliminarlo, la bandera `--rm`, esto para eliminar el contenedor cuando este falle o se detenga
 
 ```
 docker run -d --rm --name mi-nginx nginx
@@ -295,7 +295,7 @@ docker run -d --rm --name mi-nginx nginx
 
 ### Puertos
 
-Para mapear los puertos usaremos la bandera _-p#:#_
+Para mapear los puertos usaremos la bandera `-p#:#`
 Donde el primer puerto es el puerto fisico de nuestra maquina y el segundo es el puerto del container
 
 > Los puertos que se deben usar son los mayores a 1024, estos puertos están reservados para operaciones del sistema
@@ -312,7 +312,7 @@ De manera predeterminada, si el container "muere" entonces todos los datos del c
 
 Para guardar los datos independientemente de si el contenedor se elimina o no, nosotros podemos crear una ruta dentro de nuestro sistema de archivos para conservar la data, **Volúmenes basados en una ruta**
 
-Para lograr esto usaremos la bandera -v (volume) el cual recibe dos parametros, primero especificaremos una ruta de nuestra computadora local y posteriormente especificaremos una ruta en el container
+Para lograr esto usaremos la bandera `-v` (volume) el cual recibe dos parametros, primero especificaremos una ruta de nuestra computadora local y posteriormente especificaremos una ruta en el container
 
 ```
 docker run -d --rm -p8000:80 -v C:/Users/elliot.gandarilla/Documents/docker-curso:/usr/share/nginx/html --name mi-nginx nginx
@@ -334,7 +334,7 @@ Comando para crear un volúmen
 docker volume create web
 ```
 
-Para montar un volúmen haremos uso de la bandera _--mount_ el cual recibe dos parametros, primero especificamos un _source_ que es el volumen a montar (previamente creado) y posteriormente el _target_, que es la ruta a donde deseamos montar el volúmen
+Para montar un volúmen haremos uso de la bandera `--mount` el cual recibe dos parametros, primero especificamos un _source_ que es el volumen a montar (previamente creado) y posteriormente el _target_, que es la ruta a donde deseamos montar el volúmen
 
 ```
 docker run -d --rm -p8000:80 --mount source=web,target=/usr/share/nginx/html --name mi-nginx nginx
@@ -493,7 +493,7 @@ Un documento de texto, que contiene los comandos que normalmente se ejecutarían
 
 ### ¿Cómo se crea un Dockerfile?
 
-Se puede utilizar el comando touch en sistemas operativo Linux y en Windows o Mac, click derecho, crear un archivo de texto. El archivo se debe llamar Dockerfile, con mayúscula. \*\*\*\*
+Se puede utilizar el comando touch en sistemas operativo Linux y en Windows o Mac, click derecho, crear un archivo de texto. El archivo se debe llamar **Dockerfile**, con **mayúscula**.
 
 ### Editando el Dockerfile
 
@@ -502,7 +502,7 @@ Se puede utilizar el comando touch en sistemas operativo Linux y en Windows o Ma
 - RUN: Para ejecutar comandos adentro de las imágenes.
   -y: Una bandera que funciona para contestar a las descargas que necesitan interacción.
 - CMD: Para ejecutar comandos, la diferencia entre RUN y CMD es que RUN solo se ejecutara al crear la imagen, en cambio, CMD se ejecutará cuando este corriendo la imagen.
-- EXPOSE: Si se monto un servidor web y se quiere exponer la información de este servidor, este comando se puede usar para exponer este servidor en algún puerto.
+- EXPOSE: Si se montó un servidor web y se quiere exponer la información de este servidor, este comando se puede usar para exponer este servidor en algún puerto.
 
 ```
 # Esta es mi primera imagen de Docker
@@ -519,7 +519,7 @@ EXPOSE 5000
 
 ### Docker build
 
-Comando para construir imágenes de Docker usando un Dockerfile, es una buena practica usar -t y así generar un tag, darle nombre y versión a la imagen que se este creando, se debe especificar la ruta donde esta el Dockerfile y todos los archivos que se quieren usar para la imagen
+Comando para construir imágenes de Docker usando un Dockerfile, es una buena practica usar `-t` y así generar un tag, darle nombre y versión a la imagen que se este creando, se debe especificar la ruta donde esta el Dockerfile y todos los archivos que se quieren usar para la imagen
 
 > Si se tiene el Dockerfile y los archivos que se quieren usar en la carpeta que se esta usando, se usa .
 
@@ -630,12 +630,15 @@ De la misma manera que se crearía un Dockerfile o un .html, con touch en la ter
 Crear una imagen usando Dockerfile que copie archivos (Usando ADD o COPY) y un .dockerignore.
 
 _Ejemplo del contenido de un .dockerignore_
+
 ![Alt text](image-15.png)
 
 Crear un contenedor basado en la imagen del paso anterior.
+
 ![Alt text](image-16.png)
 
 Revisar el contenido del contenedor usando el comando exec.
+
 ![Alt text](image-17.png)
 
 ## 3.6 - Publicar imágenes en Docker Hub
@@ -670,3 +673,261 @@ docker push mauriballesdev/hola-docker-hub:1.0
 - Collaborators: Permitir a otros usuarios colaborar en el desarrollo de imágenes.
 - Configuraciones: Poder cambiar el repositorio a privado o eliminarlo.
   Permite poner una descripción corta y/o un readme sobre la imagen (archivo con información sobre la imagen).
+
+## 4 - Docker Compose
+
+## 4.1 - Conceptos
+
+### ¿Qué es?
+
+Es una herramienta para definir y ejecutar aplicaciones Docker de varios contenedores.
+
+Para Compose, se usa un archivo YAML para configurar los servicios de una app. Usando 1 comando, se crea e inicia todo los servicios.
+
+### ¿Cómo funciona
+
+Son 3 procesos:
+
+- Definir el entorno de la aplicación con un Dockerfile.
+- Definir los servicios que componen su aplicación en docker-compose.yml para que puedan ejecutarse juntos en un entorno aislado.
+- Ejecutar docker-compose up y Compose inicia, ejecutando toda la aplicación.
+
+### Instalación:
+
+Al instalar Docker Desktop se descarga docker-compose.
+Usando algún sistema Linux, usando python, específicamente pip, debe agregar sudo si pide algún permiso de sistema.
+
+```
+pip install docker-compose
+
+sudo pip install docker-compose
+```
+
+## 4.2 - docker-compose.yml
+
+El archivo se debe llamar docker-compose.yml (siempre en minúscula), se crea usando el comando touch en Linux y click derecho, crear archivo de texto en Windows y Mac.
+
+### Editar archivo
+
+> Por estar trabajando en un archivo .yml, se trabaja declarando objetos y asignándoles valores.
+
+- Versión: Se especifica la versión de Docker-compose.
+- Services: Los servicios permiten crear y después, conectarlo entre si. Abajo se indica el nombre del servicio y sus especificaciones.
+- Build: Crear una imagen y contenedor desde el Docker compose usando un Dockerfile, se debe especificar donde esta el Dockerfile.
+- Image: Indicar nombre a la imagen que se construya con build.
+- Ports: Permite exponer puertos de un contenedor en la máquina local, hace lo mismo que la bandera -p
+- Environment: Para usar variables de entorno.
+
+```
+version: "3"
+
+services:
+	web:
+		build: .
+		images: hola-docker-2:1.0
+		ports:
+			- 5000:5000
+		environment:
+			MSG: 'Saludo a todos desde compose!'
+```
+
+### ¿Cómo usar Docker Compose?
+
+Se simplifica en usar el comando `docker-compose up` para: levantar contenedores, crear una red que conecte el/los servicios, crear una imagen y crea un contenedor-servicio.
+
+```
+docker compose up
+```
+
+> Igual que docker run, se puede usar la bandera `-d` para correr el proceso en segundo plano.
+
+Si se quiere usar las variables de entorno de un contenedor, se utiliza el comando `exec` y usar `bash`. En docker-compose, existe el comando `run` para ejecutar bash adentro del contenedor.
+
+Este comando necesita dos parametros, el servicio y el comando a ejecutar en el container
+
+```
+docker compose run web bash
+```
+
+### Detener Servicios
+
+Usando `docker compose down`, revisa los servicios activos, detiene los servicios detectados y elimina los recursos que se habían creado (La red, las imágenes y contenedores).
+
+```
+docker compose down
+```
+
+> Al usar `docker compose` y un archivo Dockerfile, recomendable usar la bandera `--build`, para que se actualice la imagen automáticamente cada vez que se modifique el Dockerfile.
+
+```
+docker compose up -d --build
+```
+
+## 4.3 - Servicios
+
+### ¿Qué son los servicios?
+
+Son la manera en la cual Docker-compose puede crear contenedores y comunicarlos entre si.
+
+### Relación entre servicios
+
+- db: Un objeto que existe para crear servicios.
+- restart: Cuando el contenedor no funciona como debería, Docker vuelve a levantarlo, básicamente, el programa va a intentar mejorar el rendimiento con un "Apagar y volver a prender".
+
+```
+db:
+	images: postgres
+	restart: always
+	environment:
+		POSTGRES_PASSWORD: example
+```
+
+### Investigar en Docker Hub
+
+> Docker Hub es el lugar donde se recopila información de alguna imagen. Específicamente, la información disponible es: La descripción, las versiones, cómo usar la imagen para un contenedor y cómo utilizar la imagen con docker-compose.
+
+### Intercomunicar Servicios
+
+Los servicios se pueden comunicar entre si siguiendo estos pasos:
+
+- Modificar el Dockerfile: Agregar la directiva `RUN` e instalar `postgresql-client -y`
+- Desde la terminal: Usar `docker-compose up` para levantar el contenedor y `docker-compose run web bash` para ingresar al contenedor.
+- Activar la conexión: En el primer paso se instalo el comando psql, el cual permite hacer conexiones con una base de datos (PostgreSQL). La bandera `-U` es para especificar el nombre, por defecto es postgres; la bandera `-W` se usa para conectarse a una base de datos, usamos la que esta por defecto, postgres; `-p` funciona para usar algún puerto y `-h` para ingresar a la red de docker-compose.
+
+Dockerfile
+
+```
+  RUN apt-get install postgresql-client -y
+```
+
+CLI
+
+```
+docker-compose up -d --build
+
+docker-compose run web bash
+```
+
+```
+psql -h db -p 5432 -U postgres -W postgres
+```
+
+Así se ingresa a la base de datos, en el host definimos el servicio por su nombre "db", posteriormente su puerto por defecto, usuario por defecto, base de datos y red que esta por defecto.
+
+> Docker crea redes, estas redes crean DNS (Nombre de dominio), a cada le asigna un DNS y así los otros contenedores-servicios que estén adentro del mismo archivo docker-compose conectarse. De esta manera se pueden crear aplicaciones que puedan acceder a servicios que necesitemos e interconectarlos.
+
+## 4.4 - Variables de construcción
+
+### ¿Qué son?
+
+Son variables que hacen lo mismo que una variable de entorno. Estas van en un archivo .env donde se declaran variables de entorno que van a ser valores y configurar un archivo docker-compose.yml.
+
+> El archivo .env SOLO funciona para declarar variables que usara docker-compose.
+
+### ¿Cómo se usan?
+
+- Crear el archivo .env: esto con touch o click derecho > crear archivo de texto, debe compartir carpeta con docker-compose.
+- Pasar variables: Solo es escribir adentro del archivo .env las variables de entorno. Para definirlas todas letras del nombre deben estar en mayúscula y si hay varias palabras, excepto de separarlas con espacio, se debe usar guion bajo \_
+- Docker-Compose debe usar las variables: Excepto de escribir los valores de los objetos en el mismo docker-compose, escribir el nombre de las variables de construcción encerradas en {} y el signo de dolar \$. `${VAR}`
+- Levantar los servicios: Para ello esta `docker-compose up -d --build`
+- Revisar configuraciones: Corriendo Bash adentro del contenedor, esto con docker-compose run web bash, lo siguiente es revisar las variables una por una con el comando echo y nombre de la variable.
+
+_Archivo .env_
+
+```
+  DB_PASS=hola123
+  MSG_CONTENEDOR='Hola variables'
+```
+
+_Archivo docker-compose.yml_
+
+```
+  DB_PASSWORD: ${DB_PASS}
+  MSG: ${MSG_CONTENEDOR}
+```
+
+_CLI_
+
+```
+docker-compose run web bash
+
+echo $MSG
+echo $DB_PASS
+```
+
+## 4.5 - Volúmenes
+
+### Manejo de volúmenes
+
+> Se sigue editando un Dockefile
+
+Los volúmenes se manejan de 3 formas:
+
+- Almacenándola en la memoria, si la vida útil del contenedor se termina, también la información adentro de este se acaba, se elimina.
+- Conectar con una ruta de archivos, que la información de esa carpeta se vea reflejada en el contenedor.
+- Crear un Volumen, así Docker se encarga de el, aunque el contenedor muera, la información seguirá ahí, en nuestra maquina local.
+
+### Crear Volúmenes con Docker Compose
+
+Volúmenes: Un objeto el cual se le especifica 2 cosas: La ruta en la maquina local y la ruta en el contenedor. Con solo un . el programa entiende que TODO lo que este en la carpeta donde se esta trabajando, lo tiene que copiar (No copia lo que indique el Dockerignore)
+
+```
+volumes:
+	- .:/app
+```
+
+### Otra manera
+
+Creando un volumen que se guarde, sin importar el contenedor que lo use.
+
+- data: Es el nombre del volumen, en este caso se llama data, sin embargo, se puede llamar de cualquier manera, lo importante es que tenga un nombre
+- driver: Es el driver que se usa por defecto, en este caso se usa el que esta por defecto, local
+
+```
+volumes:
+	data:
+		driver: local
+```
+
+### Revisar Bases de Datos
+
+Ingresar adentro del contenedor usando docker run web bash
+Conectarse al servidor de la base de datos, para ello se utiliza la "cadena de conexión" que seria psql.
+Ya con acceso a la base de datos, utilizando `\l` se visualizan las bases de datos disponibles (las 3 se crean por defecto) y con `CREATE DATABASE `crear una nueva base de datos
+
+```
+docker run web bash
+```
+
+```
+psql -h db -p 5432 -U postgres -W postgres
+```
+
+```
+\l
+
+CREATE DATABASE hola WITH OWNER postgres
+```
+
+Si se detiene el servicio que contiene la base de datos recién creada y se vuelve a levantar, se elimina esa base de datos por no tener un volumen que guardara los cambios que se habían hecho.
+
+### Buscar una Solución
+
+La solución a este problema y muchos otros problemas debería estar en Docker Hub, en la descripción profunda de la imagen postgres se puede ver el directorio donde se guarda la data y esa ruta es usada para crear un volumen.
+
+```
+db:
+image: postgres
+restart: always
+environment:
+POSTGRES_PASSWORD: ${DB_PASS}
+volumes: - /var/lib/postgresql/data
+
+volumes:
+data:
+driver: local
+```
+
+Ahora ya esta guarda la información de la base de datos en un volumen, después de indicarle al programa cual era la ruta donde estaba la información, la cuál se almacena aparte, creando un respaldo.
+
+![Alt text](image-18.png)

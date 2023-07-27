@@ -6,13 +6,14 @@ FROM ubuntu
 # Ejecutar comando dentro de la imagen (construcción)
 RUN apt-get update
 RUN apt-get install python3 python3-dev -y
+RUN apt-get install postgresql-client -y
 RUN mkdir /app
 
 # Definir mi directorio de trabajo
 WORKDIR /app
 
 # Definimos una variable de entorno
-ENV MSG='Saludos a todos ✌'
+ENV MSG='Saludos a todos desde Docker ✌'
 
 # Copiar archivos a mi contenedor
 # ADD index.html .
