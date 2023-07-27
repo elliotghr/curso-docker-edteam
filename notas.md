@@ -504,7 +504,7 @@ Se puede utilizar el comando touch en sistemas operativo Linux y en Windows o Ma
 - CMD: Para ejecutar comandos, la diferencia entre RUN y CMD es que RUN solo se ejecutara al crear la imagen, en cambio, CMD se ejecutará cuando este corriendo la imagen.
 - EXPOSE: Si se montó un servidor web y se quiere exponer la información de este servidor, este comando se puede usar para exponer este servidor en algún puerto.
 
-```
+```docker
 # Esta es mi primera imagen de Docker
 
 FROM Ubuntu
@@ -552,7 +552,7 @@ Para ver la información expuesta en el localhost, se va a cualquier navegador y
 - mkdir: para crear un nuevo directorio.
 - WORKDIR: Permite definir un directorio de trabajo, donde se ejecuten los archivos del contenedor y los archivos que se quieran copiar.
 
-```
+```docker
 FROM Ubuntu
 
 RUN apt-get update
@@ -573,7 +573,7 @@ Estos 2 comandos funcionan para copiar-mover archivos de nuestra máquina local 
 - ADD: Puede copiar archivos desde la maquina local, un link o archivos en un archivo comprimido
 - COPY: Solo permite copiar archivos de la maquina local.
 
-```
+```docker
 ADD index.html /app
 ADD index.html .
 ```
@@ -718,7 +718,7 @@ El archivo se debe llamar docker-compose.yml (siempre en minúscula), se crea us
 - Ports: Permite exponer puertos de un contenedor en la máquina local, hace lo mismo que la bandera -p
 - Environment: Para usar variables de entorno.
 
-```
+```yml
 version: "3"
 
 services:
@@ -774,7 +774,7 @@ Son la manera en la cual Docker-compose puede crear contenedores y comunicarlos 
 - db: Un objeto que existe para crear servicios.
 - restart: Cuando el contenedor no funciona como debería, Docker vuelve a levantarlo, básicamente, el programa va a intentar mejorar el rendimiento con un "Apagar y volver a prender".
 
-```
+```yml
 db:
 	images: postgres
 	restart: always
@@ -796,7 +796,7 @@ Los servicios se pueden comunicar entre si siguiendo estos pasos:
 
 Dockerfile
 
-```
+```dockerfile
   RUN apt-get install postgresql-client -y
 ```
 
@@ -834,16 +834,16 @@ Son variables que hacen lo mismo que una variable de entorno. Estas van en un ar
 
 _Archivo .env_
 
-```
+```env
   DB_PASS=hola123
   MSG_CONTENEDOR='Hola variables'
 ```
 
 _Archivo docker-compose.yml_
 
-```
-  DB_PASSWORD: ${DB_PASS}
-  MSG: ${MSG_CONTENEDOR}
+```yml
+DB_PASSWORD: ${DB_PASS}
+MSG: ${MSG_CONTENEDOR}
 ```
 
 _CLI_
@@ -931,3 +931,250 @@ driver: local
 Ahora ya esta guarda la información de la base de datos en un volumen, después de indicarle al programa cual era la ruta donde estaba la información, la cuál se almacena aparte, creando un respaldo.
 
 ![Alt text](image-18.png)
+
+## 5. Aplicación y Consejos
+
+## 5.1 - Diseño para integrar Docker en tus aplicaciones
+
+### Notas importantes al integrar Docker en un proyecto:
+
+- Lenguajes de programación, tecnologías y base de datos. Es probable que exista una imagen relacionada a lo que se esta usando en el proyecto, capaz de facilitar el proceso.
+- Dependencias, Es importante por que las dependencias pueden y/o son necesarias al construir una imagen.
+- Manejo de los datos, Es necesario encontrar la manera más eficaz de manejar la información usando volúmenes.
+- Comunicación con otros servicios, Docker-Compose ayuda a esto, mayormente se trabaja con bases de datos y es necesario crear una comunicación.
+- Documentación, Para revisar la información de las imágenes que se están usando y así encontrar soluciones a los problemas.
+
+### Herramientas para el Diseño
+
+Ayudan a diagramar alguna estructura de las aplicaciones. El profesor recomienda:
+
+- Draw.io
+- Lucidchart
+
+### Ejemplo del curso
+
+- Preparar un ambiente de desarrollo (XAMPP versión Docker).
+- Integrar a una aplicación existente (Integrar a una aplicación web con Python).
+
+## 5.2 - Preparar un ambiente de desarrollo con Docker
+
+### Objetivos
+
+- Crear un ambiente de desarrollo parecido a XAMPP para desarrollas aplicaciones PHP.
+- Crear una base de datos para poder persistir la información de las aplicaciones creadas.
+- Exponer un servicio en el puerto 80 u otro disponible para poder acceder a la información de los archivos PHP.
+
+### Estructura del Proyecto
+
+- index.php ⇒ Archivo de pruebas para mostrar información y conectarse a una base de datos.
+- docker-compose.yml ⇒ Configuración de servicios y contenedores para desarrollo de aplicaciones.
+- Dockerfile ⇒ Definición de una imagen Docker con PHP y sus extensiones para conectarse a la base de datos.
+
+### docker-compose.yml
+
+```yml
+version: '3'
+
+services:
+	web:
+		build: .
+		image: mi-xampp:1.0
+		ports:
+			- "80:80"
+		volumes:
+			- .:/var/www/html
+
+	db:
+		image: mysql:5.7
+		environment:
+			MYSQL_DATABASE: xampp
+			MYSQL_ROOT_PASSWORD: hello1234
+		volumes:
+			- xampp-data:/var/lib/mysql
+
+volumes:
+	xampp-data:
+		driver: local
+```
+
+Dockerfile
+
+```dockerfile
+FROM php:7.3-apache
+
+RUN docker-php-ext-install -j$(nproc) pdo
+RUN docker-php-ext-install -j$(nproc) pdo_mysql
+```
+
+Index.php
+
+```php
+<?php
+
+echo '<h1>Hola Mundo, como estan!</h1>';
+
+$conexion = new PDO('mysql:host=db;dbname=xampp', 'root', 'hello1234');
+
+$res = $conexion->exec('SELECT "Hola a todos"');
+echo $res;
+
+?>
+```
+
+### Crear ambiente
+
+Solo con usar el comando `docker compose up -d --build`, se construye el servidor apache donde se puede correr archivos .php
+
+## 5.3 - Integración con tu proyecto de software
+
+### Objetivos
+
+- Integrar con una aplicación existente en python que utiliza una base de datos postgres.
+- Configurar servicios para la comunicación entre si.
+- Exponer un servicio en el puerto 5000 u otro disponible para poder acceder a la información de la aplicación.
+
+### Estructura
+
+- app.py ⇒ Contiene la configuración del proyecto web, esta escrito en python usando el microframework Flask y la librería pscopg.
+- requirements.txt ⇒ Tiene todas las dependencias-librerías de mi proyecto web en python.
+- .dockerignore ⇒ Lista de archivos y carpetas que no se tendrán en cuenta.
+- docker-compose.yml ⇒ Configuración de servicios y contenedores para el funcionamiento de la aplicación.
+- Dockerfile ⇒ Definición de una imagen Docker con python para instalar las librerías del proyecto y poder conectarse a la base de datos.
+
+app.py
+
+```py
+import psycopg2
+import os
+
+from flask import Flask
+
+app = Flask(__name__)
+
+def get_conexion():
+info = ''
+user = os.getenv('DB_USER','gmfqxtjr')
+password = os.getenv('DB_PASS','uhAmgqUuk4hVAgMAeRvHovJIa94DeG1x')
+host = os.getenv('DB_HOST','tuffi.db.elephantsql.com')
+port = os.getenv('DB_PORT','5432')
+database = os.getenv('DB_NAME','gmfqxtjr')
+try:
+connection = psycopg2.connect(
+user=user, password=password,
+host=host, port=port, database=database)
+info = str(connection.get_dsn_parameters())
+connection.close()
+except:
+info = 'ERROR'
+return info
+
+@app.route('/', methods=['GET'])
+def index():
+conexion = get_conexion()
+return {
+'mensaje': 'Hola mundo',
+'conexion': conexion
+}
+
+if __name__ == '__main__':
+app.run(host='0.0.0.0', port=5000)
+```
+
+requirements.txt (dependencias de python)
+
+```
+flask
+psycopg2-binary
+```
+
+.dockerignore
+
+```docker
+venv (directorio de python en entornos virtuales)
+```
+
+docker-compose.yml
+
+```yml
+version: '3'
+
+services:
+web:
+build: .
+image: python-web:1.0
+ports: - "5000:5000"
+volumes: - .:/app
+environment:
+DB_USER: postgres
+DB_PASS: hello1234
+DB_HOST: db
+DB_PORT: 5432
+DB_NAME: postgres
+
+db:
+image: postgres
+environment:
+POSTGRES_PASSWORD: hello1234
+volumes: - postgres-data:/var/lib/postgresql/data
+
+volumes:
+postgres-data:
+driver: local
+```
+
+Dockerfile
+
+```dockerfile
+FROM python:3
+
+RUN apt-get update
+RUN apt-get install libpq-dev -y
+RUN mkdir /app
+
+WORKDIR /app
+
+ADD . .
+
+RUN pip install -r requirements.txt
+
+CMD python app.py
+
+EXPOSE 5000
+```
+
+### Integración
+
+Ejecutando `docker-compose up -d --build` se integra Docker automáticamente.
+
+> Esto es adaptable a cualquier proyecto, sin importar la tecnología que se use.
+
+## 5.4 - Herramientas adicionales
+
+Herramientas hechas por y para la comunidad, capaces de facilitarnos la vida.
+
+### Lazydocker
+
+Ayuda a poder visualizar y/o previsualizar información acerca de imágenes, contenedores, volúmenes y servicios. Esto es posible gracias a que, básicamente, el programa obtiene la información (sin que el usuario tenga que escribir comandos correspondientes para cada información) y la pone en una interfaz gráfica adentro de la terminal.
+
+### dockstation
+
+Otra herramienta que también muestra la información de Docker en una interfaz gráfica, la diferencia entre esta y la anterior, es que dockstation no es desde la terminal. Con esta herramientas se puede hacer TODO lo que se haría normalmente en Docker de manera más visual.
+
+### Awesome Docker
+
+No es una herramienta como tal, es buscador que ayuda a encontrar recursos para los proyectos-aplicaciones que se estén creando.
+
+## 5.5 - Tips para construir imágenes
+
+1. Imágenes Alpine: Muy recomendable usar imágenes basadas en Alpine, pesan menos y esto ayuda a reducir el espacio en disco.
+   - No siempre tienen las dependencias o librerías al 100, para esto, podemos usar slim, es un poco más pesado pero contiene todas las librerías
+2. Comando RUN: Mientras menos comandos RUN se tenga, menos capas tendrá la imagen y será más ligera. Con un comando RUN se puede ejecutar muchos comandos, excepto de poner un RUN por cada comando. Los saltos de linea se generan con && \\
+
+   ![Alt text](image-19.png)
+
+3. Copiar Archivos: No siempre es mejor copiar todo los archivos en el directorio, a veces se debe de analizar los procesos ejecutados dentro del contenedor y usar solo lo necesario.
+
+   ![Alt text](image-20.png)
+   Cuando copiamos todo como el primer ejemplo y se genera un nuevo build por algún cambio en el código se van a construir de nuevo todos los archivos aunque haya cambiado solo uno. Si dividimos la copia como en el segundo ejemplo primero va a evaluar si se necesita re construir el archivo requirements, si no fue modificado entonces procede a ejecutar el comando siguiente, esto nos ahorrará tiempo al no reconstruir todos los archivos antes de le ejecución del comando.
+
+4. Documentación: Es un paso importante al trabajar con Docker, tener la documentación-la información sobre la herramientas a la mano.
