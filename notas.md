@@ -450,3 +450,223 @@ Y ahora sí podremos enviar un ping de nuestro container mi-nginx a nuestro otro
 
 - Usar Bridge sobre las demás
 - A la hora de diseñar una red siempre tener bien mapeado la comunicación entre contenedores
+
+## 3. Imagenes
+
+## 3.1 - Conceptos
+
+### ¿Qué son las imágenes?
+
+Son las bases de los contenedores.
+
+Las imágenes son una colección ordenada de cambios en el sistema de archivos raíz y los parámetros correspondientes de ejecución para su uso en cualquier contenedor.
+
+Las imágenes se construyen con 1 Docker file, un archivo donde se especifica las características de una imagen.
+
+### Capas en las Imágenes
+
+Las imágenes están conformadas por sistemas unidos y apilados uno abajo de otro. Una imagen no tiene estado y nunca cambia.
+
+### Docker Hub
+
+Es un recurso centralizado para usar con Docker y sus componentes. Docker Hub funciona para:
+
+- Alojamiento de Imágenes de Docker.
+- Integración con Github y Bitbucket.
+- Autenticación de Usuarios.
+- Automatizar construcción de imágenes.
+
+## 3.2 - Dockerfile
+
+### ¿Qué es?
+
+Un documento de texto, que contiene los comandos que normalmente se ejecutarían de forma manual para crear una imagen. Docker crea imágenes automáticamente leyendo un Docker File.
+
+### Consejos
+
+- Docker Hub, cuando se necesita información sobre una imagen se puede recurrir a este recurso.
+- Editor de Código, cualquiera funciona, en el curso se usa Sublime Text.
+- Conexión a Internet, es necesario para descargar imágenes del Docker Hub.
+- Paciencia, avanzar a pasos lentos y seguros.
+
+### Construcción de Imágenes
+
+### ¿Cómo se crea un Dockerfile?
+
+Se puede utilizar el comando touch en sistemas operativo Linux y en Windows o Mac, click derecho, crear un archivo de texto. El archivo se debe llamar Dockerfile, con mayúscula. \*\*\*\*
+
+### Editando el Dockerfile
+
+- \# : Para crear comentarios, se pueden usar para documentar.
+- FROM : Las imágenes de Docker están basadas en otras imágenes, este comando es para especificar en que imagen se basara la nueva imagen .
+- RUN: Para ejecutar comandos adentro de las imágenes.
+  -y: Una bandera que funciona para contestar a las descargas que necesitan interacción.
+- CMD: Para ejecutar comandos, la diferencia entre RUN y CMD es que RUN solo se ejecutara al crear la imagen, en cambio, CMD se ejecutará cuando este corriendo la imagen.
+- EXPOSE: Si se monto un servidor web y se quiere exponer la información de este servidor, este comando se puede usar para exponer este servidor en algún puerto.
+
+```
+# Esta es mi primera imagen de Docker
+
+FROM Ubuntu
+
+RUN apt-get update
+RUN apt-get install python3 python3-dev -y
+
+CMD python3 -m http.server 5000
+
+EXPOSE 5000
+```
+
+### Docker build
+
+Comando para construir imágenes de Docker usando un Dockerfile, es una buena practica usar -t y así generar un tag, darle nombre y versión a la imagen que se este creando, se debe especificar la ruta donde esta el Dockerfile y todos los archivos que se quieren usar para la imagen
+
+> Si se tiene el Dockerfile y los archivos que se quieren usar en la carpeta que se esta usando, se usa .
+
+```
+docker build -t hola-docker:1.0 .
+```
+
+Docker leerá el Dockerfile e ira ejecutando las capas-comandos, creando una imagen. Esta imagen ya puede ser usada para crear contenedores.
+
+Tras generar el build podremos verificar la existencia de la imagen
+
+![Alt text](image-12.png)
+
+Y posteriormente crear un container a partir de esa imagen
+
+Ejemplo de como crear el container mapeando los puertos para visualizar el contenido del container
+
+```
+docker run -d --rm -p5000:5000 --name mi-imagen hola-docker:1.0
+```
+
+## 3.3 - Copiar archivos
+
+### Puertos y Localhost
+
+Para ver la información expuesta en el localhost, se va a cualquier navegador y se escribe localhost: + el puerto con la información del contenedor
+
+### Nuevos Comandos
+
+- mkdir: para crear un nuevo directorio.
+- WORKDIR: Permite definir un directorio de trabajo, donde se ejecuten los archivos del contenedor y los archivos que se quieran copiar.
+
+```
+FROM Ubuntu
+
+RUN apt-get update
+RUN apt-get install python3 python3-dev -y
+RUN mkdir /app
+
+WORKDIR /app
+
+CMD python3 -m http.server 5000
+
+EXPOSE 5000
+```
+
+### Copiar Archivos
+
+Estos 2 comandos funcionan para copiar-mover archivos de nuestra máquina local a un contenedor. También funcionan para copiar carpetas
+
+- ADD: Puede copiar archivos desde la maquina local, un link o archivos en un archivo comprimido
+- COPY: Solo permite copiar archivos de la maquina local.
+
+```
+ADD index.html /app
+ADD index.html .
+```
+
+## 3.4 - Variables de entorno
+
+### ¿Qué son?
+
+Son valores que usa el sistema operativo para configurar software y programas. Se utilizan para definir valores que deben estar en el sistema.
+
+### Crear una Variable de Entorno
+
+ENV: Para crear una variable de entorno
+
+```
+#Variable de entorno
+ENV MSG='Saludos a todos'
+```
+
+### Revisar las variables
+
+Se entra al contenedor usando el comando exec y el modo interactivo con -it
+Usar comando echo, permite imprimir valores.
+
+```
+docker exec -it mi-contenedor
+echo $MSG
+```
+
+![Alt text](image-13.png)
+
+### Cambiar valor
+
+-e: Permite pasarle valores a las variables y cambiarles su valor
+
+```
+docker run --rm -d -p 5000:5000 --name mi-contenedor -e MSG='Hola como va' hola-docker:1.3
+```
+
+![Alt text](image-14.png)
+
+## 3.5 - Dockerignore
+
+### ¿Qué es?
+
+Es un archivo que permite ignorar archivos y así copiar-mover al contenedor solo los necesarios. En su interior se especifican los archivos que el programa va ignorar y así no se suben al contenedor.
+
+### ¿Cómo se crea?
+
+De la misma manera que se crearía un Dockerfile o un .html, con touch en la terminal de Linux o con click derecho > crear archivo de texto en Windows y Mac. El nombre del archivo debe ser **.dockerignore**.
+
+### Utilizar el Dockerignore
+
+Crear una imagen usando Dockerfile que copie archivos (Usando ADD o COPY) y un .dockerignore.
+
+_Ejemplo del contenido de un .dockerignore_
+![Alt text](image-15.png)
+
+Crear un contenedor basado en la imagen del paso anterior.
+![Alt text](image-16.png)
+
+Revisar el contenido del contenedor usando el comando exec.
+![Alt text](image-17.png)
+
+## 3.6 - Publicar imágenes en Docker Hub
+
+> Es un registry donde se pueden subir imagen de Docker.
+
+### ¿Cómo se usa?
+
+- Hay que registrarse, usando un correo electrónico.
+- En Respitories se da click al botón "Create Repository" y se le asigna un nombre, se puede configurar para que sea publica y privada, los repositorio privados son paga, con una cuenta gratuita solo se puede tener 1 repositorio privado.
+
+### Subir imágenes a Docker Hub
+
+Para subir imagenes a Docker hub necesitaremos los siguientes comandos:
+
+- docker login: Iniciar sesión desde el navegador, va a pedir nombre de usuario y contraseña.
+- docker tag: Puedes poner etiqueta a las imágenes, para el curso, se pone una etiqueta que permite subirlas al Docker Hub.
+- docker push: Se especifica la imagen que se quiere subir y al ejecutarlo, se sube la imagen al repository.
+
+```
+docker login
+
+docker tag hola-docker:1.0 mauriballesdev/hola-docker-hub:1.0
+
+docker push mauriballesdev/hola-docker-hub:1.0
+```
+
+### Opciones de Docker Hub
+
+- Tags: Se pueden ver las versiones de las imágenes que se han subido a la plataforma.
+- Builds: Poder sincronizar Github y Bitbucket, permitiendo automatizar la construcción de las imágenes.
+- Collaborators: Permitir a otros usuarios colaborar en el desarrollo de imágenes.
+- Configuraciones: Poder cambiar el repositorio a privado o eliminarlo.
+  Permite poner una descripción corta y/o un readme sobre la imagen (archivo con información sobre la imagen).
