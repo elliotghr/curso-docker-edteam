@@ -11,11 +11,11 @@ Indice
 - Docker Compose
 - Desarrollo de aplicaciones
 
-Una tecnología persiste en el tiempo dependiendo de quienes la usan
-
 ## 1.2 - Conceptos
 
-- Docker es una cajita magica para correr mis aplicaciones, en cualquier lugar, sin complicaciones y eliminando el casico: "En mi computadora si funciona"
+Docker es un proyecto de código abierto que automatiza el despliegue de aplicaciones dentro de contenedores de software, proporcionando una capa adicional de abstracción y automatización de virtualización de aplicaciones en múltiples sistemas operativos.
+
+- Docker es una cajita magica para correr mis aplicaciones, en cualquier lugar, sin complicaciones y eliminando el clásico: "En mi computadora si funciona"
 - El termino de contenedores no es algo nuevo dentro del entorno de Linux
 - Docker se puede correr en diferentes SO, en la nube, e incluso dentro de una MV
 
@@ -33,7 +33,7 @@ Esto significa que docker se ubica sobre la capa de infraestructura y posteriorm
 
 Las MV son una abstracción de hardware fisico que convierte un servidor en muchos servidores
 
-Las MV ta,bién están sobre la infraestructura y el SO de nuestra máquina, sin embargo, estas traen su porpio SO, susprocesos, librerías y kernel, esto las hace más pesadas en tamaño (GB)
+Las MV también están sobre la infraestructura y el SO de nuestra máquina, sin embargo, estas traen su porpio SO, susprocesos, librerías y kernel, esto las hace más pesadas en tamaño (GB)
 
 ![Alt text](image-2.png)
 
@@ -295,7 +295,7 @@ docker run -d --rm --name mi-nginx nginx
 
 ### Puertos
 
-Para mapear los puertos usaremos la bandera `-p#:#`
+Para mapear los puertos usaremos la bandera `-p #:#`
 Donde el primer puerto es el puerto fisico de nuestra maquina y el segundo es el puerto del container
 
 > Los puertos que se deben usar son los mayores a 1024, estos puertos están reservados para operaciones del sistema
@@ -318,7 +318,7 @@ Para lograr esto usaremos la bandera `-v` (volume) el cual recibe dos parametros
 docker run -d --rm -p8000:80 -v C:/Users/elliot.gandarilla/Documents/docker-curso:/usr/share/nginx/html --name mi-nginx nginx
 ```
 
-Con esto podemos generar la data en nueustra maquina local y de esta manera podemos conservar los datos en el container
+Con esto podemos generar la data en nuestra maquina local y de esta manera podemos conservar los datos en el container
 
 El tercer método consiste en crear un Volúmen directamente en Docker
 
@@ -445,6 +445,29 @@ Al inspeccionar nuestra red bridge nos podremos percatar de que mi-nginx-3 ahora
 Y ahora sí podremos enviar un ping de nuestro container mi-nginx a nuestro otro container mi-nginx-3
 
 ![Alt text](image-11.png)
+
+## Usar una red ya existente
+
+También puedes decirle a Compose:
+
+"No la crees; ya existe."
+
+```yml
+networks:
+  backend:
+    external: true
+    name: mi-red-backend
+```
+
+Compose no intentará crearla.
+
+Tú debes crearla antes:
+
+```cmd
+docker network create mi-red-backend
+```
+
+Esto es muy útil cuando varios proyectos deben compartir la misma red.
 
 ### Recomendaciones:
 
@@ -575,7 +598,7 @@ Estos 2 comandos funcionan para copiar-mover archivos de nuestra máquina local 
 
 ```docker
 ADD index.html /app
-ADD index.html .
+COPY index.html .
 ```
 
 ## 3.4 - Variables de entorno
@@ -599,7 +622,7 @@ Se entra al contenedor usando el comando exec y el modo interactivo con -it
 Usar comando echo, permite imprimir valores.
 
 ```
-docker exec -it mi-contenedor
+docker exec -it mi-contenedor bash
 echo $MSG
 ```
 
